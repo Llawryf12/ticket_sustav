@@ -73,16 +73,48 @@ export const updateTicket = async (req, res) => {
 
 export const updateTicketStatus = async (req, res) => {
   const { id } = req.params;
-  const { status, id_administratora } = req.body;
+  
+  const { 
+    status, 
+    id_administratora, 
+    utroseno_minuta, 
+    je_fakturirano, 
+    satnica 
+  } = req.body || {};
+
+  if (!status) {
+    return res.status(400).json({ message: 'Status je obavezno polje.' });
+  }
 
   try {
+    // Sigurno pretvaranje u odgovarajuće tipove
+    const minute = Number(utroseno_minuta) || 0;
+    const poSatu = Number(satnica) || 0;
+    const fakturirano = Boolean(je_fakturirano);
+
+    // Izračun: ako je označeno za fakturiranje, računamo iznos
+    const ukupnoCijena = fakturirano ? parseFloat(((minute / 60) * poSatu).toFixed(2)) : 0.00;
+
     const result = await db.query(
       `UPDATE ticket 
-       SET status = $1, 
-           id_administratora = COALESCE($2, id_administratora) 
-       WHERE id_ticketa = $3 
+       SET status = $1::varchar, 
+           id_administratora = COALESCE($2, id_administratora),
+           utroseno_minuta = $3,
+           je_fakturirano = $4,
+           satnica = $5,
+           ukupna_cijena = $6,
+           datum_zatvaranja = CASE WHEN $1::varchar IN ('Riješen', 'Zatvoren') THEN CURRENT_TIMESTAMP ELSE datum_zatvaranja END
+       WHERE id_ticketa = $7 
        RETURNING *`,
-      [status, id_administratora, id]
+      [
+        status, 
+        id_administratora || null, 
+        minute, 
+        fakturirano, 
+        poSatu, 
+        ukupnoCijena, 
+        id
+      ]
     );
 
     if (result.rowCount === 0) {
