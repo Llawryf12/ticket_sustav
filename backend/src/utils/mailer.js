@@ -18,14 +18,15 @@ const transporter = nodemailer.createTransport({
 });
 
 // Provjera SMTP veze pri pokretanju
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ Greška pri spajanju na mail poslužitelj (SMTP):', error.message);
-  } else {
-    console.log('✅ Mail poslužitelj je spreman za slanje poruka.');
-  }
-});
+transporter.verify()
+  .then(() => {
+    console.log('✅ SMTP VEZA USPJEŠNA - mail.dbw.hr prihvaća vezu.');
+  })
+  .catch((error) => {
+    console.error('❌ SMTP VEZA NIJE USPJEŠNA:', error.message);
+  });
 
+  
 export const sendNotificationEmail = async (toEmail, subject, textContent, ticketId) => {
   if (!toEmail) {
     console.warn('⚠️ Slanje emaila otkazano: Adresa primatelja (toEmail) je prazna.');
