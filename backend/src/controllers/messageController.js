@@ -126,25 +126,12 @@ export const sendMessage = async (req, res) => {
 
       // Ako poruku šalje korisnik -> šalji adminu
 
-      if (
-        Number(id_posiljatelja) ===
-        Number(ticketData.id_korisnika)
-      ) {
-
-        recipientEmail =
-          ticketData.admin_email ||
-          process.env.EMAIL_USER;
-
-      }
-
-      // Ako poruku šalje admin -> šalji korisniku
-
-      else {
-
-        recipientEmail =
-          ticketData.korisnik_email;
-
-      }
+      if (Number(id_posiljatelja) === Number(ticketData.id_korisnika)) {
+  recipientEmail =
+    ticketData.admin_email || process.env.BREVO_ADMIN_EMAIL;
+} else {
+  recipientEmail = ticketData.korisnik_email;
+}
 
 
       console.log(
