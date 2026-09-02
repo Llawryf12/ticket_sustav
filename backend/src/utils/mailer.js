@@ -1,4 +1,25 @@
 import nodemailer from 'nodemailer';
+import net from 'net';
+
+const socket = net.createConnection({
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  timeout: 10000
+});
+
+socket.on('connect', () => {
+  console.log('✅ TCP VEZA PREMA BREVO 587 RADI');
+  socket.destroy();
+});
+
+socket.on('timeout', () => {
+  console.error('❌ TCP VEZA PREMA BREVO 587 TIMEOUT');
+  socket.destroy();
+});
+
+socket.on('error', (error) => {
+  console.error('❌ TCP VEZA PREMA BREVO 587 GREŠKA:', error.message);
+});
 
 console.log('SMTP konfiguracija:', {
   host: process.env.EMAIL_HOST,
