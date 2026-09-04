@@ -12,14 +12,30 @@ export const getAllTickets = async (filterStatus) => {
     LEFT JOIN korisnik a ON t.id_administratora = a.id_korisnika
   `;
   const params = [];
+  const conditions = [];
 
+
+  // Filtriranje po statusu
   if (filterStatus && filterStatus !== 'Svi') {
-    query += ` WHERE t.status = $1`;
     params.push(filterStatus);
+    conditions.push(`t.status = $${params.length}`);
+  }
+
+  // Filtriranje po firmi
+  if (filterFirma && filterFirma !== 'Svi') {
+    params.push(filterFirma);
+    conditions.push(`k.firma = $${params.length}`);
+  }
+
+  // Dodavanje WHERE samo ako postoji barem jedan filter
+  if (conditions.length > 0) {
+    query += ` WHERE ${conditions.join(' AND ')}`;
   }
 
   query += ` ORDER BY t.datum_kreiranja DESC`;
+
   const { rows } = await db.query(query, params);
+
   return rows;
 };
 

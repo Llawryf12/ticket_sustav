@@ -4,11 +4,11 @@ import db from '../config/db.js';
 export const getTickets = async (req, res) => {
   try {
     const { uloga, id_korisnika } = req.user;
-    const { status } = req.query;
+    const { status, firma } = req.query;
 
     let tickets;
     if (uloga === 'Administrator') {
-      tickets = await TicketModel.getAllTickets(status);
+      tickets = await TicketModel.getAllTickets(status, firma);
     } else {
       tickets = await TicketModel.getTicketsByUser(id_korisnika);
     }
