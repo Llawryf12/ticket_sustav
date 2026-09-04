@@ -23,7 +23,7 @@ export const getAllTickets = async (filterStatus) => {
   return rows;
 };
 
-// Dohvat ticketa za određenog korisnika
+// Dohvat ticketa za određenog korisnika (također dodano za svaki slučaj)
 export const getTicketsByUser = async (idKorisnika) => {
   const query = `
     SELECT 
@@ -31,6 +31,7 @@ export const getTicketsByUser = async (idKorisnika) => {
       k.firma AS firma,
       a.ime AS admin_ime, a.prezime AS admin_prezime
     FROM ticket t
+    JOIN korisnik k ON t.id_korisnika = k.id_korisnika
     LEFT JOIN korisnik a ON t.id_administratora = a.id_korisnika
     WHERE t.id_korisnika = $1
     ORDER BY t.datum_kreiranja DESC
