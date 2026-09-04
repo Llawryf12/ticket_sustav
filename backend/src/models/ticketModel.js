@@ -1,7 +1,7 @@
 import db from '../config/db.js';
 
 // Dohvat svih ticketa (s imenom autor-korisnika i administratora)
-export const getAllTickets = async (filterStatus) => {
+export const getAllTickets = async (filterStatus, filterFirma) => {
   let query = `
     SELECT 
       t.*,
