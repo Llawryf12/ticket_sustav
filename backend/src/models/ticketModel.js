@@ -5,7 +5,7 @@ export const getAllTickets = async (filterStatus) => {
   let query = `
     SELECT 
       t.*,
-      k.ime AS korisnik_ime, k.prezime AS korisnik_prezime,
+      k.ime AS korisnik_ime, k.prezime AS korisnik_prezime, k.firma AS firma,
       a.ime AS admin_ime, a.prezime AS admin_prezime
     FROM ticket t
     JOIN korisnik k ON t.id_korisnika = k.id_korisnika
@@ -28,6 +28,7 @@ export const getTicketsByUser = async (idKorisnika) => {
   const query = `
     SELECT 
       t.*,
+      k.firma AS firma,
       a.ime AS admin_ime, a.prezime AS admin_prezime
     FROM ticket t
     LEFT JOIN korisnik a ON t.id_administratora = a.id_korisnika
@@ -81,4 +82,11 @@ export const updateTicketStatusAndAdmin = async (idTicketa, status, idAdministra
   `;
   const { rows } = await db.query(query, [status, idAdministratora || null, datumZatvaranja, idTicketa]);
   return rows[0];
+};
+
+//dohvat svih naziva firmi iz tablice korisnik
+export const getAllCompanies = async () => {
+  const query = `SELECT DISTINCT firma FROM korisnik WHERE firma IS NOT NULL AND firma != '' ORDER BY firma ASC`;
+  const { rows } = await db.query(query);
+  return rows.map(r => r.firma);
 };

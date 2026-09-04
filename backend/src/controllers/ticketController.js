@@ -127,3 +127,15 @@ export const updateTicketStatus = async (req, res) => {
     res.status(500).json({ message: 'Greška na poslužitelju.' });
   }
 };
+
+
+// Endpoint za dohvat svih firmi
+export const getCompanies = async (req, res) => {
+  try {
+    const companies = await TicketModel.getAllCompanies();
+    res.json(companies);
+  } catch (error) {
+    console.error('Greška pri dohvatu firmi:', error);
+    res.status(500).json({ message: 'Greška na poslužitelju.' });
+  }
+};
