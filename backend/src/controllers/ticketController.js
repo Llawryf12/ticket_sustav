@@ -52,6 +52,8 @@ export const createNewTicket = async (req, res) => {
       id_korisnika
     });
 
+    
+
     // Slanje obavijesti administratoru
 await sendTicketCreatedNotification(newTicket.id_ticketa);
 

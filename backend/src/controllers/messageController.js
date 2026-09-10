@@ -239,7 +239,8 @@ ${ticket.korisnik_email || 'Nije dostupna e-mail adresa.'}
       adminEmail,
       `Novi ticket #${ticket.id_ticketa}: ${ticket.naslov}`,
       poruka,
-      ticket.id_ticketa
+      ticket.id_ticketa,
+       'novi_ticket'
     );
 
     console.log(
