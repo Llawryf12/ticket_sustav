@@ -1,5 +1,6 @@
 import * as TicketModel from '../models/ticketModel.js';
 import db from '../config/db.js';
+import { sendTicketCreatedNotification } from './messageController.js';
 
 export const getTickets = async (req, res) => {
   try {
@@ -50,6 +51,10 @@ export const createNewTicket = async (req, res) => {
       datum_nastanka_problema: datum_nastanka_problema || new Date(),
       id_korisnika
     });
+
+    // Slanje obavijesti administratoru
+await sendTicketCreatedNotification(newTicket.id_ticketa);
+
 
     res.status(201).json(newTicket);
   } catch (error) {

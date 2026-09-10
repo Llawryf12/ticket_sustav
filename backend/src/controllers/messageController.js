@@ -87,7 +87,7 @@ export const sendMessage = async (req, res) => {
       );
 
 
-    console.log('✅ Poruka spremljena:', newMessage);
+  
 
 
     // Dohvat emaila korisnika i administratora
@@ -134,11 +134,7 @@ export const sendMessage = async (req, res) => {
 }
 
 
-      console.log(
-        `📧 Priprema slanja maila.
-        Primatelj: ${recipientEmail},
-        Pošiljatelj ID: ${id_posiljatelja}`
-      );
+      
 
 
       if (recipientEmail) {
@@ -182,4 +178,78 @@ export const sendMessage = async (req, res) => {
 
   }
 
+};
+
+//slanje obavijesti administratoru kada korisnik kreira ticket
+export const sendTicketCreatedNotification = async (ticketId) => {
+  try {
+    const ticketRes = await db.query(
+      `
+      SELECT
+        t.id_ticketa,
+        t.naslov,
+        t.opis,
+        t.id_korisnika,
+        k.ime,
+        k.prezime,
+        k.e_mail AS korisnik_email
+      FROM ticket t
+      JOIN korisnik k
+        ON t.id_korisnika = k.id_korisnika
+      WHERE t.id_ticketa = $1
+      `,
+      [ticketId]
+    );
+
+    const ticket = ticketRes.rows[0];
+
+    if (!ticket) {
+      console.warn(
+        `⚠️ Ticket #${ticketId} nije pronađen za slanje obavijesti administratoru.`
+      );
+      return;
+    }
+
+    const adminEmail = process.env.BREVO_ADMIN_EMAIL;
+
+    if (!adminEmail) {
+      console.warn(
+        '⚠️ BREVO_ADMIN_EMAIL nije postavljen u environment varijablama.'
+      );
+      return;
+    }
+
+    const korisnikIme =
+      `${ticket.ime || ''} ${ticket.prezime || ''}`.trim();
+
+    const poruka = `
+Korisnik ${korisnikIme || 'korisnik'} kreirao je novi ticket.
+
+Ticket #${ticket.id_ticketa}
+Naslov: ${ticket.naslov}
+
+Opis:
+${ticket.opis || 'Nije naveden opis.'}
+
+Korisnik:
+${ticket.korisnik_email || 'Nije dostupna e-mail adresa.'}
+    `.trim();
+
+    await sendNotificationEmail(
+      adminEmail,
+      `Novi ticket #${ticket.id_ticketa}: ${ticket.naslov}`,
+      poruka,
+      ticket.id_ticketa
+    );
+
+    console.log(
+      `📧 Obavijest o novom ticketu #${ticket.id_ticketa} poslana administratoru.`
+    );
+
+  } catch (error) {
+    console.error(
+      'Greška pri slanju obavijesti administratoru:',
+      error
+    );
+  }
 };
