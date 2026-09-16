@@ -146,3 +146,23 @@ export const getCompanies = async (req, res) => {
     res.status(500).json({ message: 'Greška na poslužitelju.' });
   }
 };
+
+
+
+// Endpoint za dohvat statistike za određenu firmu
+export const getCompanyStatistics = async (req, res) => {
+  try {
+    const { firma } = req.query;
+    
+    // Ako nije odabrana konkretna firma, vrati nule
+    if (!firma || firma === 'Svi') {
+      return res.json({ ukupno_minuta: 0, ukupna_cijena: 0 });
+    }
+
+    const stats = await TicketModel.getCompanyStats(firma);
+    res.json(stats);
+  } catch (error) {
+    console.error('Greška pri dohvatu statistike za firmu:', error);
+    res.status(500).json({ message: 'Greška na poslužitelju.' });
+  }
+};

@@ -107,3 +107,17 @@ export const getAllCompanies = async () => {
   const { rows } = await db.query(query);
   return rows.map(r => r.firma);
 };
+
+// Dohvat statistike (ukupno vrijeme i cijena) za pojedinu firmu
+export const getCompanyStats = async (firma) => {
+  const query = `
+    SELECT 
+      ROUND(COALESCE(SUM(t.utroseno_minuta), 0) / 60.0, 2) AS ukupno_sati,
+      COALESCE(SUM(t.ukupna_cijena), 0) AS ukupna_cijena
+    FROM ticket t
+    JOIN korisnik k ON t.id_korisnika = k.id_korisnika
+    WHERE k.firma = $1
+  `;
+  const { rows } = await db.query(query, [firma]);
+  return {ukupno_sati:Number(rows[0].ukupno_sati), ukupna_cijena: Number(rows[0].ukupna_cijena)};
+};
