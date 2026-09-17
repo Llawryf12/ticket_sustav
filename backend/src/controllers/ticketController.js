@@ -86,7 +86,8 @@ export const updateTicketStatus = async (req, res) => {
     id_administratora, 
     utroseno_minuta, 
     je_fakturirano, 
-    satnica 
+    satnica,
+    odrzani_radovi 
   } = req.body || {};
 
   if (!status) {
@@ -110,7 +111,8 @@ export const updateTicketStatus = async (req, res) => {
            je_fakturirano = $4,
            satnica = $5,
            ukupna_cijena = $6,
-           datum_zatvaranja = CASE WHEN $1::varchar IN ('Riješen', 'Zatvoren') THEN CURRENT_TIMESTAMP ELSE datum_zatvaranja END
+           datum_zatvaranja = CASE WHEN $1::varchar IN ('Riješen', 'Zatvoren') THEN CURRENT_TIMESTAMP ELSE datum_zatvaranja END,
+           odrzani_radovi=$8
        WHERE id_ticketa = $7 
        RETURNING *`,
       [
@@ -120,7 +122,8 @@ export const updateTicketStatus = async (req, res) => {
         fakturirano, 
         poSatu, 
         ukupnoCijena, 
-        id
+        id,
+        odrzani_radovi || null
       ]
     );
 
