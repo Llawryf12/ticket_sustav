@@ -17,3 +17,48 @@ export const findAllAdmins = async () => {
   const { rows } = await db.query(query);
   return rows;
 };
+
+export const createUser = async ({
+  ime,
+  prezime,
+  e_mail,
+  korisnicko_ime,
+  lozinka_hash,
+  uloga,
+  firma
+}) => {
+  const query = `
+    INSERT INTO korisnik (
+      ime,
+      prezime,
+      e_mail,
+      korisnicko_ime,
+      lozinka_hash,
+      uloga,
+      firma
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING
+      id_korisnika,
+      ime,
+      prezime,
+      e_mail,
+      korisnicko_ime,
+      uloga,
+      firma
+  `;
+
+  const values = [
+    ime,
+    prezime,
+    e_mail,
+    korisnicko_ime,
+    lozinka_hash,
+    uloga,
+    firma
+  ];
+
+  const { rows } = await db.query(query, values);
+
+  return rows[0];
+};
